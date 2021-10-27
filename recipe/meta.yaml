@@ -1,19 +1,18 @@
+{% set name = "elfutils" %}
 {% set version = "0.185" %}
 
 package:
-  name: elfutils
+  name: {{ name|lower }}-split
   version: {{ version }}
 
 source:
-  fn: elfutils-{{ version }}.tar.bz2
+  fn: {{ name|lower }}-{{ version }}.tar.bz2
   url: https://fedorahosted.org/releases/e/l/elfutils/{{ version }}/elfutils-{{ version }}.tar.bz2
   sha256: dc8d3e74ab209465e7f568e1b3bb9a5a142f8656e2b57d10049a73da2ae6b5a6
 
 build:
-  number: 0
+  number: 1
   skip: true  # [not linux]
-  run_exports:
-    - {{ pin_subpackage('elfutils', max_pin='x.x') }}
 
 requirements:
   build:
@@ -34,10 +33,57 @@ requirements:
     #- libmicrohttpd
     #- sqlite
 
-test:
-  requires:
-    - {{ compiler('c') }}
-    - pkg-config
+outputs:
+  - name: {{ name }}
+    files:
+      - bin/eu-*
+      - include/dwarf.h
+      - include/elfutils/*.h
+      - include/gelf.h
+      - include/libelf.h
+      - include/nlist.h
+      - lib/libasm.a
+      - lib/libdw.a
+      - lib/libelf.a
+      - lib/pkgconfig/libdw.pc
+      - lib/pkgconfig/libelf.pc
+      - share/locale/*/LC_MESSAGES/elfutils.mo
+      - share/man/man1/eu-*
+      - share/man/man3/elf_*
+    run_exports:
+      - {{ pin_subpackage("libelf") }}
+    requirements:
+      build:
+        - {{ compiler('c') }}
+        - {{ compiler('cxx') }}
+      host:
+        - {{ pin_subpackage("libelf", exact=True) }}
+      run:
+        - {{ pin_subpackage("libelf", exact=True) }}
+    test:
+      files:
+        - test_libdwarf.c
+      requires:
+        - {{ compiler("c") }}
+        - pkg-config
+      script: run_test.sh
+
+  - name: libelf
+    files:
+      - lib/libasm-{{ version }}.so
+      - lib/libasm.so*
+      - lib/libdw-{{ version }}.so
+      - lib/libdw.so*
+      - lib/libelf-{{ version }}.so
+      - lib/libelf.so*
+    requirements:
+      build:
+        - {{ compiler('c') }}
+      host:
+        - bzip2
+        - xz
+        - zlib
+        - zstd
 
 about:
   home: https://fedorahosted.org/elfutils/
@@ -49,3 +95,4 @@ extra:
   recipe-maintainers:
     - edisongustavo
     - xhochy
+    - chenghlee

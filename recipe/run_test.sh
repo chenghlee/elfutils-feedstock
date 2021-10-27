@@ -13,5 +13,7 @@ eu-strings --help
 eu-strip --help
 eu-unstrip --help
 
-eval "${CC} -o ./test_libdwarf $RECIPE_DIR/test_libdwarf.c $(pkg-config --cflags libdw) $(pkg-config --libs libdw)"
+${CC} test_libdwarf.c -o ./test_libdwarf \
+    $(pkg-config --cflags libdw) \
+    $(pkg-config --libs libdw)
 ./test_libdwarf
