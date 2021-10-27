@@ -23,14 +23,16 @@ requirements:
     - make
   host:
     - bzip2
-    - libarchive
-    - libcurl
-    - libmicrohttpd
     - m4
-    - sqlite
     - xz
     - zlib
     - zstd
+
+    # Only needed when building debuginfod
+    #- libarchive
+    #- libcurl
+    #- libmicrohttpd
+    #- sqlite
 
 test:
   requires:
